@@ -301,17 +301,12 @@ void node_persistent_cache::nodes_set_create_writeout_block()
     if (sync_file_range(node_cache_fd, (osmid_t) writeNodeBlock.block_offset*WRITE_NODE_BLOCK_SIZE * sizeof(ramNode) +
                         sizeof(persistentCacheHeader), WRITE_NODE_BLOCK_SIZE * sizeof(ramNode),
                         SYNC_FILE_RANGE_WRITE) < 0) {
-        fprintf(stderr, "Info: Sync_file_range writeout has an issue. This shouldn't be anything to worry about.: %s\n",
-                strerror(errno));
     };
 
     if (writeNodeBlock.block_offset > 16) {
         if(sync_file_range(node_cache_fd, ((osmid_t) writeNodeBlock.block_offset - 16)*WRITE_NODE_BLOCK_SIZE * sizeof(ramNode) +
                            sizeof(persistentCacheHeader), WRITE_NODE_BLOCK_SIZE * sizeof(ramNode),
                             SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER) < 0) {
-            fprintf(stderr, "Info: Sync_file_range block has an issue. This shouldn't be anything to worry about.: %s\n",
-                strerror(errno));
-
         }
 #ifdef HAVE_POSIX_FADVISE
         if (posix_fadvise(node_cache_fd, ((osmid_t) writeNodeBlock.block_offset - 16)*WRITE_NODE_BLOCK_SIZE * sizeof(ramNode) +
